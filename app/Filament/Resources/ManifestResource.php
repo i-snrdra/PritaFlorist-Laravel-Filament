@@ -24,7 +24,7 @@ class ManifestResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
     
     protected static ?string $navigationLabel = 'Manifest';
-    
+    protected static ?string $navigationGroup = 'Order';
     protected static ?string $pluralModelLabel = 'Manifests';
 
     public static function form(Form $form): Form
