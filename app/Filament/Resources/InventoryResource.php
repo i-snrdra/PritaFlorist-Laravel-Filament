@@ -44,9 +44,9 @@ class InventoryResource extends Resource
                 Tables\Columns\BadgeColumn::make('stock')
                     ->label('Stok')
                     ->colors([
-                        'danger' => fn ($state) => $state <= 10,
                         'warning' => fn ($state) => $state <= 20,
-                        'success' => fn ($state) => $state > 10,
+                        'success' => fn ($state) => $state > 20,
+                        'danger' => fn ($state) => $state <= 10,
                     ])
                     ->formatStateUsing(fn ($state) => $state . ' pcs')
                     ->sortable(),
