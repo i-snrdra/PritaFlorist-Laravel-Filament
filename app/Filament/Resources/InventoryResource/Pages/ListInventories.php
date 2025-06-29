@@ -16,4 +16,10 @@ class ListInventories extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+    public function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\InventoryResource\Widgets\InventorySummary::class,
+        ];
+    }
 }
