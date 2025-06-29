@@ -3,7 +3,10 @@
         {{ $this->filtersForm }}
     @endif
 
-    
+    <div class="mt-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Ringkasan Pendapatan</h2>
+        @livewire(\App\Filament\Resources\OrderResource\Widgets\IncomeOverview::class)
+    </div>
     <div class="mt-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Ringkasan Pengeluaran</h2>
         @livewire(\App\Filament\Resources\ExpenseResource\Widgets\ExpenseSummary::class)
