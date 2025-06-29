@@ -16,4 +16,11 @@ class ListExpenses extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+    public function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\ExpenseResource\Widgets\ExpenseSummary::class,
+        ];
+    }
+
 }

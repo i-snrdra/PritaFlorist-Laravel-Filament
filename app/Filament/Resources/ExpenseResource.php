@@ -34,9 +34,7 @@ class ExpenseResource extends Resource
                     ->prefix('Rp '),
                 Forms\Components\DatePicker::make('date')
                     ->label('Tanggal')
-                    ->required()
-                    ->displayFormat('d-m-Y')
-                    ->format('d-m-Y'),                
+                    ->required(),
                 Forms\Components\TextInput::make('responsible_person')
                     ->label('Dikeluarkan Oleh')
                     ->required()
@@ -93,6 +91,12 @@ class ExpenseResource extends Resource
             'index' => Pages\ListExpenses::route('/'),
             'create' => Pages\CreateExpense::route('/create'),
             'edit' => Pages\EditExpense::route('/{record}/edit'),
+        ];
+    }
+    public static function getWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\ExpenseResource\Widgets\ExpenseSummary::class,
         ];
     }
 }
