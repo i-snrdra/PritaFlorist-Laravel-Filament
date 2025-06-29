@@ -96,6 +96,9 @@ class ManifestResource extends Resource
                                 Forms\Components\Select::make('inventory_id')
                                     ->label('Barang')
                                     ->relationship('inventory', 'name')
+                                    ->getOptionLabelFromRecordUsing(fn ($record): string => 
+                                        "{$record->name} (Stok: {$record->stock})"
+                                    )
                                     ->required()
                                     ->searchable()
                                     ->preload(),
@@ -104,7 +107,8 @@ class ManifestResource extends Resource
                                     ->label('Quantity')
                                     ->numeric()
                                     ->required()
-                                    ->default(1),
+                                    ->default(1)
+                                    ->helperText('Pastikan quantity tidak melebihi stok yang tersedia'),
                                     
                                 Forms\Components\TextInput::make('qty_dikembalikan')
                                     ->label('Qty Dikembalikan')
@@ -176,6 +180,18 @@ class ManifestResource extends Resource
                     ->label('Jumlah Barang')
                     ->counts('manifestItems')
                     ->badge(),
+                    
+                Tables\Columns\TextColumn::make('inventory_summary')
+                    ->label('Stok Inventory')
+                    ->getStateUsing(function (Manifest $record) {
+                        $items = $record->manifestItems()->with('inventory')->get();
+                        $summary = $items->map(function($item) {
+                            return "{$item->inventory->name}: {$item->inventory->stock}";
+                        })->take(3)->implode(', ');
+                        
+                        return $items->count() > 3 ? $summary . '...' : $summary;
+                    })
+                    ->wrap(),
                     
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')

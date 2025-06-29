@@ -23,6 +23,18 @@ class CreateManifest extends CreateRecord
             $data['type'] = $request->get('type');
         }
 
+        // Validasi stok inventory sebelum create
+        if (isset($data['manifestItems'])) {
+            foreach ($data['manifestItems'] as $item) {
+                if (isset($item['inventory_id']) && isset($item['qty'])) {
+                    $inventory = \App\Models\Inventory::find($item['inventory_id']);
+                    if ($inventory && $item['qty'] > $inventory->stock) {
+                        throw new \Exception("Quantity {$item['qty']} untuk {$inventory->name} melebihi stok yang tersedia ({$inventory->stock}).");
+                    }
+                }
+            }
+        }
+
         return $data;
     }
 
