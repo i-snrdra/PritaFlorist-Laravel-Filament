@@ -16,4 +16,10 @@ class ListCrews extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+    public function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\CrewResource\Widgets\CrewSummary::class,
+        ];
+    }
 }

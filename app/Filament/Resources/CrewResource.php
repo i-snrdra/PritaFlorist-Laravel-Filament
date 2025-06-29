@@ -97,4 +97,10 @@ class CrewResource extends Resource
             'edit' => Pages\EditCrew::route('/{record}/edit'),
         ];
     }
+    public static function getWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\CrewResource\Widgets\CrewSummary::class,
+        ];
+    }
 }
