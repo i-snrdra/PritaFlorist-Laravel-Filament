@@ -24,14 +24,21 @@ class ExpenseResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Keperluan')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('amount')
+                    ->label('Jumlah')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->prefix('Rp '),
                 Forms\Components\DatePicker::make('date')
-                    ->required(),
+                    ->label('Tanggal')
+                    ->required()
+                    ->displayFormat('d-m-Y')
+                    ->format('d-m-Y'),                
                 Forms\Components\TextInput::make('responsible_person')
+                    ->label('Dikeluarkan Oleh')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -47,17 +54,18 @@ class ExpenseResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Jumlah')
-                    ->sortable(),
+                    ->sortable()
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state, 0, ',', '.')),                
                 Tables\Columns\TextColumn::make('date')
                     ->label('Tanggal')
+                    ->date('d-m-Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('responsible_person')
                     ->label('Dikeluarkan Oleh')
-                    ->sortable(),
+                    ->sortable(),   
             ])
+            ->defaultSort('date', 'desc')
             ->filters([
-                Tables\Filters\SelectFilter::make('name')
-                    ->options(Expense::all()->pluck('name', 'name')),
                 Tables\Filters\SelectFilter::make('responsible_person')
                     ->options(Expense::all()->pluck('responsible_person', 'responsible_person')),
             ])
