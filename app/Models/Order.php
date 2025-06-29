@@ -56,10 +56,18 @@ class Order extends Model
     public function calculateTotalHarga(): void
     {
         $packagePrice = $this->package ? $this->package->price : 0;
-        $extrasTotal = $this->orderExtras->sum('subtotal');
+        
+        // Calculate extras total (hanya untuk non-studio foto)
+        $extrasTotal = 0;
+        if ($this->type !== 'studio_foto') {
+            $extrasTotal = $this->orderExtras->sum('subtotal');
+        }
+        
         $this->total_harga = $packagePrice + $extrasTotal;
         $this->save();
     }
+
+    // Manual calculation method (dipanggil dari Filament Resource)
 
     // Accessor untuk display nama
     public function getDisplayNameAttribute(): string

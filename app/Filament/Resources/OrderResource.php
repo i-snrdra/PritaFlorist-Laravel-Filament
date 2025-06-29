@@ -98,6 +98,10 @@ class OrderResource extends Resource
                                     $query->where('name', $categoryMap[$type]);
                                 })->pluck('name', 'id');
                             })
+                            ->reactive()
+                            ->afterStateUpdated(function (Set $set, Get $get, $state) {
+                                self::calculateTotalHarga($set, $get);
+                            })
                             ->required(),
                     ])
                     ->columns(2),
@@ -135,6 +139,16 @@ class OrderResource extends Resource
                             ])
                             ->default('dp')
                             ->required(),
+
+                        Forms\Components\TextInput::make('total_harga')
+                            ->label('Total Harga')
+                            ->prefix('Rp')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated()
+                            ->default(0)
+                            ->reactive()
+                            ->formatStateUsing(fn ($state) => $state ? number_format($state, 0, ',', '.') : '0'),
                     ])
                     ->columns(2),
 
@@ -149,17 +163,28 @@ class OrderResource extends Resource
                             ->label('Quantity')
                             ->numeric()
                             ->required()
-                            ->default(1),
+                            ->default(1)
+                            ->reactive()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                self::calculateTotalHarga($set, $get);
+                            }),
                         Forms\Components\TextInput::make('harga_satuan')
                             ->label('Harga Satuan')
                             ->numeric()
                             ->prefix('Rp')
-                            ->required(),
+                            ->required()
+                            ->reactive()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                self::calculateTotalHarga($set, $get);
+                            }),
                     ])
                     ->columns(3)
                     ->collapsible()
                     ->label('Tambahan')
-                    ->visible(fn (Get $get): bool => $get('type') !== 'studio_foto'),
+                    ->visible(fn (Get $get): bool => $get('type') !== 'studio_foto')
+                    ->afterStateUpdated(function (Set $set, Get $get) {
+                        self::calculateTotalHarga($set, $get);
+                    }),
 
                 // Vendor
                 Forms\Components\Repeater::make('orderVendors')
@@ -178,6 +203,36 @@ class OrderResource extends Resource
                     ->label('Vendor')
                     ->visible(fn (Get $get): bool => $get('type') !== 'studio_foto'),
             ]);
+    }
+
+    protected static function calculateTotalHarga(Set $set, Get $get): void
+    {
+        $packageId = $get('package_id');
+        $orderExtras = $get('orderExtras') ?? [];
+        $type = $get('type');
+
+        // Get package price
+        $packagePrice = 0;
+        if ($packageId) {
+            $package = Package::find($packageId);
+            $packagePrice = $package ? $package->price : 0;
+        }
+
+        // Calculate extras total (hanya untuk non-studio foto)
+        $extrasTotal = 0;
+        if ($type !== 'studio_foto' && !empty($orderExtras)) {
+            foreach ($orderExtras as $extra) {
+                $qty = (float) ($extra['qty'] ?? 0);
+                $hargaSatuan = (float) ($extra['harga_satuan'] ?? 0);
+                $extrasTotal += $qty * $hargaSatuan;
+            }
+        }
+
+        // Calculate total
+        $totalHarga = $packagePrice + $extrasTotal;
+        
+        // Set total harga
+        $set('total_harga', $totalHarga);
     }
 
     public static function table(Table $table): Table

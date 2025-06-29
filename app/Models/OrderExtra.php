@@ -32,13 +32,5 @@ class OrderExtra extends Model
         static::saving(function ($orderExtra) {
             $orderExtra->subtotal = $orderExtra->qty * $orderExtra->harga_satuan;
         });
-
-        static::saved(function ($orderExtra) {
-            $orderExtra->order->calculateTotalHarga();
-        });
-
-        static::deleted(function ($orderExtra) {
-            $orderExtra->order->calculateTotalHarga();
-        });
     }
 }

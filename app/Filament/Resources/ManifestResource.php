@@ -35,10 +35,10 @@ class ManifestResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('order_id')
                             ->label('Order')
-                            ->relationship('order', 'id')
+                            ->relationship('order', 'id', fn (Builder $query) => $query->where('type', '!=', 'studio_foto'))
                             ->getOptionLabelFromRecordUsing(fn (Order $record): string => 
                                 "#{$record->id} - " . match($record->type) {
-                                    'ulang_tahun', 'studio_foto' => $record->nama ?? '',
+                                    'ulang_tahun' => $record->nama ?? '',
                                     'lamaran', 'pernikahan' => ($record->nama_pria ?? '') . ' & ' . ($record->nama_wanita ?? ''),
                                     default => ''
                                 } . " ({$record->type})"
@@ -144,7 +144,7 @@ class ManifestResource extends Resource
                     ->getStateUsing(function (Manifest $record) {
                         $order = $record->order;
                         return match($order->type) {
-                            'ulang_tahun', 'studio_foto' => $order->nama ?? '',
+                            'ulang_tahun' => $order->nama ?? '',
                             'lamaran', 'pernikahan' => ($order->nama_pria ?? '') . ' & ' . ($order->nama_wanita ?? ''),
                             default => ''
                         };
